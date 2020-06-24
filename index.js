@@ -4,7 +4,7 @@ const path = require('path')
 const Komatsu = require('komatsu')
 const Anvil = require('prismarine-provider-anvil').Anvil('1.15')
 
-const logger = new Komatsu()
+const logger = { logPromise: (a) => a } // new Komatsu()
 
 const {
 	sourceX,
@@ -82,6 +82,15 @@ async function moveChunk({ from, to }) {
 		for (const tileEntity of tileEntities.value) {
 			tileEntity.x.value = tileEntity.x.value - fromBlockX + toBlockX
 			tileEntity.z.value = tileEntity.z.value - fromBlockZ + toBlockZ
+		}
+	}
+
+	const tileTicks = chunk.value.Level.value.TileTicks.value
+
+	if (tileTicks.type === 'compound') {
+		for (const tick of tileTicks.value) {
+			tick.x.value = tick.x.value - fromBlockX + toBlockX
+			tick.z.value = tick.z.value - fromBlockZ + toBlockZ
 		}
 	}
 
