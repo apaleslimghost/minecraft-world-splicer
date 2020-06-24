@@ -17,7 +17,7 @@ minecraft-world-splicer \
   --source-world=path/to/source-world
   --source-x=0 --source-z=0 
   --source-width=1 --source-height=1
-  --target-world=path/to?target-world
+  --target-world=path/to/target-world
   --target-x=0 -target-z=0
 ```
 
