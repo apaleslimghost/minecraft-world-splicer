@@ -29,6 +29,13 @@ const chunksToCopy = Array.from({ length: sourceWidth }, (_, x) =>
 	})),
 ).flat()
 
+// all alone in the moonlight
+const memories = [
+	'minecraft:meeting_point',
+	'minecraft:home',
+	'minecraft:job_site',
+]
+
 async function moveChunk({ from, to }) {
 	const chunk = await source.loadRaw(from.x, from.z)
 	chunk.value.Level.value.zPos.value = to.z
@@ -53,6 +60,18 @@ async function moveChunk({ from, to }) {
 
 			if (entity.TileZ) {
 				entity.TileZ.value = entity.TileZ.value - fromBlockZ + toBlockZ
+			}
+
+			if (entity.Brain) {
+				for (const memory of memories) {
+					if (entity.Brain.value.memories.value[memory]) {
+						const memoryPos =
+							entity.Brain.value.memories.value[memory].value.value.value.pos
+								.value
+						memoryPos[0] = memoryPos[0] - fromBlockX + toBlockX
+						memoryPos[2] = memoryPos[2] - fromBlockZ + toBlockZ
+					}
+				}
 			}
 		}
 	}
