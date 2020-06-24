@@ -1,0 +1,50 @@
+{
+	"name": "minecraft-world-splicer",
+	"version": "1.0.0",
+	"description": "",
+	"main": "index.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/apaleslimghost/minecraft-world-splicer.git"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"bugs": {
+		"url": "https://github.com/apaleslimghost/minecraft-world-splicer/issues"
+	},
+	"homepage": "https://github.com/apaleslimghost/minecraft-world-splicer#readme",
+	"devDependencies": {
+		"husky": "^2.3.0",
+		"prettier": "^2.0.0",
+		"eslint": "^6.8.0",
+		"@quarterto/eslint-config": "^1.4.0",
+		"@quarterto/prettier": "^1.1.0",
+		"lint-staged": "^10.0.0"
+	},
+	"eslintConfig": {
+		"extends": [
+			"@quarterto"
+		]
+	},
+	"prettier": "@quarterto/prettier",
+	"lint-staged": {
+		"*.{js,jsx,json,ts,tsx,coffee}": [
+			"prettier --write"
+		]
+	},
+	"husky": {
+		"hooks": {
+			"pre-commit": "lint-staged"
+		}
+	},
+	"dependencies": {
+		"prismarine-provider-anvil": "^2.1.0",
+		"prismarine-world": "^2.2.0",
+		"vec3": "^0.1.5",
+		"yargs": "^15.3.1"
+	}
+}
