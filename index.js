@@ -1,7 +1,10 @@
 #!/usr/bin/env node
 
 const path = require('path')
+const Komatsu = require('komatsu')
 const Anvil = require('prismarine-provider-anvil').Anvil('1.15')
+
+const logger = new Komatsu()
 
 const {
 	sourceX,
@@ -26,19 +29,25 @@ const chunksToCopy = Array.from({ length: sourceWidth }, (_, x) =>
 	})),
 ).flat()
 
+async function moveChunk({ from, to }) {
+	const chunk = await source.loadRaw(from.x, from.z)
+	chunk.value.Level.value.zPos.value = to.z
+	chunk.value.Level.value.xPos.value = to.x
+	await target.saveRaw(to.x, to.z, chunk)
+}
+
 async function main() {
 	await Promise.all(
-		chunksToCopy.map(async ({ x, z }) => {
-			const chunk = await source.loadRaw(x, z)
+		chunksToCopy.map(async (from) => {
+			const to = {
+				z: from.z - sourceZ + targetZ,
+				x: from.x - sourceX + targetX,
+			}
 
-			const zPos = chunk.value.Level.value.zPos.value
-			const xPos = chunk.value.Level.value.xPos.value
-			const targetZPos = zPos - sourceZ + targetZ
-			const targetXPos = xPos - sourceX + targetX
-			chunk.value.Level.value.zPos.value = targetZPos
-			chunk.value.Level.value.xPos.value = targetXPos
-
-			await target.saveRaw(targetXPos, targetZPos, chunk)
+			await logger.logPromise(
+				moveChunk({ from, to }),
+				`moving source chunk ${from.x},${from.z} to target ${to.x},${to.z}`,
+			)
 		}),
 	)
 }
