@@ -46,6 +46,14 @@ async function moveChunk({ from, to }) {
 			const [entityX, , entityZ] = entity.Pos.value.value
 			entity.Pos.value.value[0] = entityX - fromBlockX + toBlockX
 			entity.Pos.value.value[2] = entityZ - fromBlockZ + toBlockZ
+
+			if (entity.TileX) {
+				entity.TileX.value = entity.TileX.value - fromBlockX + toBlockX
+			}
+
+			if (entity.TileZ) {
+				entity.TileZ.value = entity.TileZ.value - fromBlockZ + toBlockZ
+			}
 		}
 	}
 
