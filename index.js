@@ -49,6 +49,15 @@ async function moveChunk({ from, to }) {
 		}
 	}
 
+	const tileEntities = chunk.value.Level.value.TileEntities.value
+
+	if (tileEntities.type === 'compound') {
+		for (const tileEntity of tileEntities.value) {
+			tileEntity.x.value = tileEntity.x.value - fromBlockX + toBlockX
+			tileEntity.z.value = tileEntity.z.value - fromBlockZ + toBlockZ
+		}
+	}
+
 	await target.saveRaw(to.x, to.z, chunk)
 }
 
