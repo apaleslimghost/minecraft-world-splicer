@@ -33,6 +33,22 @@ async function moveChunk({ from, to }) {
 	const chunk = await source.loadRaw(from.x, from.z)
 	chunk.value.Level.value.zPos.value = to.z
 	chunk.value.Level.value.xPos.value = to.x
+
+	const fromBlockX = from.x * 16
+	const fromBlockZ = from.z * 16
+	const toBlockX = to.x * 16
+	const toBlockZ = to.z * 16
+
+	const entities = chunk.value.Level.value.Entities.value
+
+	if (entities.type === 'compound') {
+		for (const entity of entities.value) {
+			const [entityX, , entityZ] = entity.Pos.value.value
+			entity.Pos.value.value[0] = entityX - fromBlockX + toBlockX
+			entity.Pos.value.value[2] = entityZ - fromBlockZ + toBlockZ
+		}
+	}
+
 	await target.saveRaw(to.x, to.z, chunk)
 }
 
