@@ -94,6 +94,15 @@ async function moveChunk({ from, to }) {
 		}
 	}
 
+	const liquidTicks = chunk.value.Level.value.LiquidTicks.value
+
+	if (liquidTicks.type === 'compound') {
+		for (const tick of liquidTicks.value) {
+			tick.x.value = tick.x.value - fromBlockX + toBlockX
+			tick.z.value = tick.z.value - fromBlockZ + toBlockZ
+		}
+	}
+
 	await target.saveRaw(to.x, to.z, chunk)
 }
 
