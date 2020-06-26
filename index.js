@@ -1,10 +1,7 @@
 #!/usr/bin/env node
 
 const path = require('path')
-const Komatsu = require('komatsu')
 const Anvil = require('prismarine-provider-anvil').Anvil('1.15')
-
-const logger = { logPromise: (a) => a } // new Komatsu()
 
 const {
 	sourceX,
@@ -46,60 +43,68 @@ async function moveChunk({ from, to }) {
 	const toBlockX = to.x * 16
 	const toBlockZ = to.z * 16
 
-	const entities = chunk.value.Level.value.Entities.value
+	if (chunk.value.Level.value.Entities) {
+		const entities = chunk.value.Level.value.Entities.value
 
-	if (entities.type === 'compound') {
-		for (const entity of entities.value) {
-			const [entityX, , entityZ] = entity.Pos.value.value
-			entity.Pos.value.value[0] = entityX - fromBlockX + toBlockX
-			entity.Pos.value.value[2] = entityZ - fromBlockZ + toBlockZ
+		if (entities.type === 'compound') {
+			for (const entity of entities.value) {
+				const [entityX, , entityZ] = entity.Pos.value.value
+				entity.Pos.value.value[0] = entityX - fromBlockX + toBlockX
+				entity.Pos.value.value[2] = entityZ - fromBlockZ + toBlockZ
 
-			if (entity.TileX) {
-				entity.TileX.value = entity.TileX.value - fromBlockX + toBlockX
-			}
+				if (entity.TileX) {
+					entity.TileX.value = entity.TileX.value - fromBlockX + toBlockX
+				}
 
-			if (entity.TileZ) {
-				entity.TileZ.value = entity.TileZ.value - fromBlockZ + toBlockZ
-			}
+				if (entity.TileZ) {
+					entity.TileZ.value = entity.TileZ.value - fromBlockZ + toBlockZ
+				}
 
-			if (entity.Brain) {
-				for (const memory of memories) {
-					if (entity.Brain.value.memories.value[memory]) {
-						const memoryPos =
-							entity.Brain.value.memories.value[memory].value.value.value.pos
-								.value
-						memoryPos[0] = memoryPos[0] - fromBlockX + toBlockX
-						memoryPos[2] = memoryPos[2] - fromBlockZ + toBlockZ
+				if (entity.Brain) {
+					for (const memory of memories) {
+						if (entity.Brain.value.memories.value[memory]) {
+							const memoryPos =
+								entity.Brain.value.memories.value[memory].value.value.value.pos
+									.value
+							memoryPos[0] = memoryPos[0] - fromBlockX + toBlockX
+							memoryPos[2] = memoryPos[2] - fromBlockZ + toBlockZ
+						}
 					}
 				}
 			}
 		}
 	}
 
-	const tileEntities = chunk.value.Level.value.TileEntities.value
+	if (chunk.value.Level.value.TileEntities) {
+		const tileEntities = chunk.value.Level.value.TileEntities.value
 
-	if (tileEntities.type === 'compound') {
-		for (const tileEntity of tileEntities.value) {
-			tileEntity.x.value = tileEntity.x.value - fromBlockX + toBlockX
-			tileEntity.z.value = tileEntity.z.value - fromBlockZ + toBlockZ
+		if (tileEntities.type === 'compound') {
+			for (const tileEntity of tileEntities.value) {
+				tileEntity.x.value = tileEntity.x.value - fromBlockX + toBlockX
+				tileEntity.z.value = tileEntity.z.value - fromBlockZ + toBlockZ
+			}
 		}
 	}
 
-	const tileTicks = chunk.value.Level.value.TileTicks.value
+	if (chunk.value.Level.value.TileTicks) {
+		const tileTicks = chunk.value.Level.value.TileTicks.value
 
-	if (tileTicks.type === 'compound') {
-		for (const tick of tileTicks.value) {
-			tick.x.value = tick.x.value - fromBlockX + toBlockX
-			tick.z.value = tick.z.value - fromBlockZ + toBlockZ
+		if (tileTicks.type === 'compound') {
+			for (const tick of tileTicks.value) {
+				tick.x.value = tick.x.value - fromBlockX + toBlockX
+				tick.z.value = tick.z.value - fromBlockZ + toBlockZ
+			}
 		}
 	}
 
-	const liquidTicks = chunk.value.Level.value.LiquidTicks.value
+	if (chunk.value.Level.value.LiquidTicks) {
+		const liquidTicks = chunk.value.Level.value.LiquidTicks.value
 
-	if (liquidTicks.type === 'compound') {
-		for (const tick of liquidTicks.value) {
-			tick.x.value = tick.x.value - fromBlockX + toBlockX
-			tick.z.value = tick.z.value - fromBlockZ + toBlockZ
+		if (liquidTicks.type === 'compound') {
+			for (const tick of liquidTicks.value) {
+				tick.x.value = tick.x.value - fromBlockX + toBlockX
+				tick.z.value = tick.z.value - fromBlockZ + toBlockZ
+			}
 		}
 	}
 
@@ -107,6 +112,8 @@ async function moveChunk({ from, to }) {
 }
 
 async function main() {
+	let complete = 0
+
 	await Promise.all(
 		chunksToCopy.map(async (from) => {
 			const to = {
@@ -114,12 +121,13 @@ async function main() {
 				x: from.x - sourceX + targetX,
 			}
 
-			await logger.logPromise(
-				moveChunk({ from, to }),
-				`moving source chunk ${from.x},${from.z} to target ${to.x},${to.z}`,
-			)
+			await moveChunk({ from, to })
+			complete++
+			process.stdout.write(`\r${complete}/${chunksToCopy.length} chunks copied`)
 		}),
 	)
+
+	console.log('\ndone!')
 }
 
 main().catch((error) => {
