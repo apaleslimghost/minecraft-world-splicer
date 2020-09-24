@@ -1,3 +1,5 @@
+<img align="right" width="300" src="https://user-images.githubusercontent.com/631757/94169395-a7a67c00-fe86-11ea-802f-e13b5c3b3572.png" alt="screenshot of merged minecraft world map">
+
 # minecraft world splicer
 
 move a section of a minecraft world into another, entities and all
